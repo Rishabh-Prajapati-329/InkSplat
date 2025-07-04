@@ -1,0 +1,14 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Bitcount+Grid+Double:wght@100..900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Bitcount Grid Double", system-ui;
+    font-weight: 400;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
