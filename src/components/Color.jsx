@@ -19,7 +19,7 @@ const Color = () => {
     }
 
     return (
-        <div style={{ zIndex: "1000", background: "rgb(255, 255, 255)", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.49)", borderRadius: "4mm", position: "absolute", top: "10px", left: "45px" }}>
+        <div style={{ zIndex: "9999", background: "rgb(255, 255, 255)", boxShadow: "0 2px 8px rgba(0, 0, 0, 0.49)", borderRadius: "2mm", position: "absolute", top: "10px", left: "44px" }}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(1, 1fr)", gridTemplateRows: "auto auto", padding: "00.4rem" }}>
                 <div>
                     {/* <p style={{ paddingBottom: "1rem" }}>Brush Colors</p> */}

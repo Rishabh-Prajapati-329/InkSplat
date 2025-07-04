@@ -8,12 +8,12 @@ const Footer = () => {
     return (
         <footer style={{ position: "fixed", bottom: "0", height: '50px', width: "100%", padding: "0 1rem", background: "#282c34", color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
 
-            <p style={{ fontSize: "1rem", paddingRight:"2rem", borderRight:"0.1mm solid #fff"}}>InkSplat</p>
+            <p style={{ fontSize: "1rem", paddingRight: "1.5rem", borderRight: "0.1mm solid #fff" }}>InkSplat</p>
 
             <div style={{ minWidth: "30%", maxWidth: "80%", display: 'flex', justifyContent: "space-between", alignItems: "center", gap: '10px' }}>
 
-                <div style={{ display: 'flex', alignItems: "center", gap: '20px' }}>
-                    <label style={{textAlign:"center"}}>
+                <div style={{ display: 'flex', alignItems: "center", gap: '20px', paddingLeft: "0.7rem" }}>
+                    <label style={{ textAlign: "center" }}>
                         Brush Size:
                         <input
                             type="number"
@@ -24,7 +24,7 @@ const Footer = () => {
                             style={{ marginLeft: '10px', width: '50px' }}
                         />
                     </label>
-                    <label style={{textAlign:"center"}}>
+                    <label style={{ textAlign: "center" }}>
                         Lazy Size:
                         <input
                             type="number"
