@@ -10,7 +10,7 @@ const Navbar = () => {
             width: '100%',
             backgroundColor: '#282c34',
             color: 'white',
-            position: 'sticky',
+            position: 'fixed',
             top: 0,
             zIndex: 1,
             
