@@ -34,7 +34,7 @@ const Canvas = () => {
             const emptyData = canvasRef.current.getSaveData();
             setBoards(prev => {
                 const next = [...prev];
-                next[currentBoardIndex] = { ...next[currentBoardIndex], data: emptyData, imgSrc: "#ffffff00" };
+                next[currentBoardIndex] = { ...next[currentBoardIndex], data: emptyData, bgColor: "#ffffff00", imgSrc: "#ffffff00" };
                 return next;
             });
         } else return;
@@ -102,7 +102,7 @@ const Canvas = () => {
                 canvasRef.current.loadSaveData(next.data || '[]', true);
                 setBoards(prev => {
                     const newBoards = [...prev];
-                    newBoards[nextIndex].imgSrc = "ffffff00";
+                    newBoards[nextIndex].imgSrc = img;
                     return newBoards;
                 });
             }
