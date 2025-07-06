@@ -102,7 +102,7 @@ const Canvas = () => {
                 canvasRef.current.loadSaveData(next.data || '[]', true);
                 setBoards(prev => {
                     const newBoards = [...prev];
-                    newBoards[nextIndex].imgSrc = img;
+                    newBoards[nextIndex].imgSrc = "ffffff00";
                     return newBoards;
                 });
             }
