@@ -1,8 +1,18 @@
-import react, { useRef, useState, Component, useContext, useEffect } from 'react';
+import react, { useRef, useState, Component, useContext, useEffect, act } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { CanvasContext } from '../context/CanvasContext';
 import Color from './Color.jsx';
 import CanvasTab from './CanvasTab.jsx';
+
+const generateSolidColorImage = (color, width, height) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, width, height);
+    return canvas.toDataURL("image/png");
+};
 
 const Canvas = () => {
     // ref / context
@@ -11,7 +21,7 @@ const Canvas = () => {
 
     // state
     const [showColorPanel, setShowColorPanel] = useState(false);
-    const [boards, setBoards] = useState([{ id: 1, data: "" }]);
+    const [boards, setBoards] = useState([{ id: 1, data: "", bgColor: '#ffffff00', imgSrc: '#ffffff00' }]);
     const [currentBoardIndex, setCurrentBoardIndex] = useState(0);
 
     // toolbar
@@ -24,7 +34,7 @@ const Canvas = () => {
             const emptyData = canvasRef.current.getSaveData();
             setBoards(prev => {
                 const next = [...prev];
-                next[currentBoardIndex] = { ...next[currentBoardIndex], data: emptyData };
+                next[currentBoardIndex] = { ...next[currentBoardIndex], data: emptyData, imgSrc: "#ffffff00" };
                 return next;
             });
         } else return;
@@ -33,6 +43,7 @@ const Canvas = () => {
     const handleSaveAsImage = () => {
         try {
             const drawingCanvas = canvasRef.current.canvas.drawing; // the canvas element with your drawing
+            const backgroundImage = boards[currentBoardIndex].imgSrc;
 
             const width = canvas.width;
             const height = canvas.height;
@@ -43,12 +54,28 @@ const Canvas = () => {
 
             const ctx = exportCanvas.getContext('2d');
 
-            ctx.drawImage(drawingCanvas, 0, 0);
-            const dataURL = exportCanvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = dataURL;
-            link.download = 'canvas-drawing.png';
-            link.click();
+            if (backgroundImage) {
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, width, height);
+                    ctx.drawImage(drawingCanvas, 0, 0);
+                    const dataURL = exportCanvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = dataURL;
+                    link.download = 'canvas-drawing.png';
+                    link.click();
+                };
+                img.src = backgroundImage;
+            } else {
+                ctx.fillStyle = boards[currentBoardIndex].bgColor;
+                ctx.fillRect(0, 0, width, height);
+                ctx.drawImage(drawingCanvas, 0, 0);
+                const dataURL = exportCanvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'canvas-drawing.png';
+                link.click();
+            }
         } catch (error) {
             console.log(error);
         }
@@ -69,20 +96,28 @@ const Canvas = () => {
         // load drawing for new board once the index is set in state
         setTimeout(() => {
             const next = boards[nextIndex];
+            const img = generateSolidColorImage(next.bgColor, canvas.width, canvas.height);
             if (canvasRef.current) {
                 canvasRef.current.clear();
-                if (next.data) canvasRef.current.loadSaveData(next.data, true);
+                canvasRef.current.loadSaveData(next.data || '[]', true);
+                setBoards(prev => {
+                    const newBoards = [...prev];
+                    newBoards[nextIndex].imgSrc = img;
+                    return newBoards;
+                });
             }
         }, 0);
     };
 
     const addNewBoard = () => {
         saveCurrentBoard();
-        const newBoard = { id: Date.now(), data: "[]" };
+        const newBoard = { id: Date.now(), data: "[]", bgColor: '#ffffff00', imgSrc: '#ffffff00' };
+        const bgImg = generateSolidColorImage('#ffffff00', canvas.width, canvas.height);
+        newBoard.imgSrc = bgImg;
         setBoards([...boards, newBoard]);
         setCurrentBoardIndex(boards.length); // new index is last
         // clear canvas for new board
-        setTimeout(() => canvasRef.current && canvasRef.current.clear(), 0);
+        setTimeout(() => canvasRef.current.clear(), 0);
     };
 
     const removeCurrentBoard = () => {
@@ -96,6 +131,15 @@ const Canvas = () => {
 
     const activeBoard = boards[currentBoardIndex];
 
+    useEffect(() => {
+        const img = generateSolidColorImage(activeBoard.bgColor, canvas.width, canvas.height);
+        setBoards(prev => {
+            const updated = [...prev];
+            updated[currentBoardIndex].imgSrc = img;
+            return updated;
+        });
+    }, [activeBoard.bgColor]);
+
     return (
         <div>
 
@@ -107,6 +151,21 @@ const Canvas = () => {
                     <button style={{ border: 'none', background: 'none', cursor: "pointer" }} onClick={clearAll}><i style={{ fontSize: '1.5rem', color: "rgba(50, 50, 50, 0.39)" }} className="fa-solid fa-eraser"></i></button>
                     <button style={{ position: "relative", background: 'none', border: "none", cursor: 'pointer' }} onClick={() => setShowColorPanel((prev) => !prev)}><i style={{ fontSize: '1.5rem', color: 'rgba(50, 50, 50, 0.39)' }} className="fa-solid fa-palette"></i></button>{showColorPanel && <Color />}
 
+                    <input
+                        type="color"
+                        value={activeBoard.bgColor}
+                        onChange={(e) => {
+                            const newColor = e.target.value;
+                            const img = generateSolidColorImage(newColor, canvas.width, canvas.height);
+                            setBoards(prev => {
+                                const next = [...prev];
+                                next[currentBoardIndex] = { ...next[currentBoardIndex], bgColor: newColor, imgSrc: img };
+                                return next;
+                            });
+                        }}
+                        title="Background Color"
+                    />
+
                     <button style={{ background: 'none', border: "none", color: "#000", cursor: 'pointer' }} onClick={handleSaveAsImage}><i style={{ fontSize: '1.5rem', color: 'rgba(50, 50, 50, 0.39)' }} className="fa-solid fa-download"></i></button>
                     <button style={{ background: 'none', border: "none", cursor: 'pointer' }} onClick={resetView}><i style={{ fontSize: '1.5rem', color: 'rgba(50, 50, 50, 0.39)' }} className="fa-solid fa-magnifying-glass"></i></button>
                     <button style={{ border: 'none', background: 'none', cursor: "pointer" }} onClick={eraseScreen}><i style={{ fontSize: '1.5rem', color: 'rgba(50, 50, 50, 0.39)' }} className="fa-solid fa-trash"></i></button>
@@ -116,7 +175,8 @@ const Canvas = () => {
 
                     <CanvasDraw style={{ border: '0.1mm solid rgb(132, 132, 132)', borderRadius: "2mm", marginLeft: '10px' }}
                         ref={canvasRef}
-                        key={activeBoard.id}
+                        key={activeBoard.id + '-' + activeBoard.imgSrc}
+                        imgSrc={activeBoard.imgSrc}
                         saveData={activeBoard.data || undefined}
                         brushColor={canvas.brushColor}
                         catenaryColor="rgba(43, 43, 43, 0.46)"
